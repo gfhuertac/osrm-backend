@@ -6,6 +6,8 @@
 #include <boost/assert.hpp>
 
 #include "extractor/guidance/roundabout_type.hpp"
+#include "util/typedefs.hpp"
+#include "util/guidance/turn_lanes.hpp"
 
 namespace osrm
 {
@@ -68,28 +70,25 @@ const constexpr Enum StayOnRoundabout = 24;                   // Continue on Eit
 // turn angle in 1.40625 degree -> 128 == 180 degree
 struct TurnInstruction
 {
+    using LaneTupel = util::guidance::LaneTupel;
     TurnInstruction(const TurnType::Enum type = TurnType::Invalid,
-                    const DirectionModifier::Enum direction_modifier = DirectionModifier::Straight)
-        : type(type), direction_modifier(direction_modifier)
-    {
-    }
+                    const DirectionModifier::Enum direction_modifier = DirectionModifier::Straight,
+                    const LaneTupel lane_tupel = {0, INVALID_LANEID})
+        : type(type), direction_modifier(direction_modifier), lane_tupel(lane_tupel)
+    {}
 
     TurnType::Enum type : 5;
     DirectionModifier::Enum direction_modifier : 3;
+    // the lane tupel that is used for the turn
+    LaneTupel lane_tupel;
 
-    static TurnInstruction INVALID()
-    {
-        return TurnInstruction(TurnType::Invalid, DirectionModifier::UTurn);
-    }
+    static TurnInstruction INVALID() { return {TurnType::Invalid, DirectionModifier::UTurn}; }
 
-    static TurnInstruction NO_TURN()
-    {
-        return TurnInstruction(TurnType::NoTurn, DirectionModifier::UTurn);
-    }
+    static TurnInstruction NO_TURN() { return {TurnType::NoTurn, DirectionModifier::UTurn}; }
 
     static TurnInstruction REMAIN_ROUNDABOUT(const RoundaboutType, const DirectionModifier::Enum modifier)
     {
-        return TurnInstruction(TurnType::StayOnRoundabout, modifier);
+        return {TurnType::StayOnRoundabout, modifier};
     }
 
     static TurnInstruction ENTER_ROUNDABOUT(const RoundaboutType roundabout_type,
@@ -134,16 +133,18 @@ struct TurnInstruction
     }
 };
 
-static_assert(sizeof(TurnInstruction) == 1, "TurnInstruction does not fit one byte");
+static_assert(sizeof(TurnInstruction) == 3, "TurnInstruction does not fit three byte");
 
 inline bool operator!=(const TurnInstruction lhs, const TurnInstruction rhs)
 {
-    return lhs.type != rhs.type || lhs.direction_modifier != rhs.direction_modifier;
+    return lhs.type != rhs.type || lhs.direction_modifier != rhs.direction_modifier ||
+           lhs.lane_tupel != rhs.lane_tupel;
 }
 
 inline bool operator==(const TurnInstruction lhs, const TurnInstruction rhs)
 {
-    return lhs.type == rhs.type && lhs.direction_modifier == rhs.direction_modifier;
+    return lhs.type == rhs.type && lhs.direction_modifier == rhs.direction_modifier &&
+           lhs.lane_tupel == rhs.lane_tupel;
 }
 
 } // namespace guidance

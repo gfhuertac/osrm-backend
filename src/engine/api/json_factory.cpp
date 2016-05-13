@@ -7,6 +7,7 @@
 #include "util/guidance/bearing_class.hpp"
 #include "util/guidance/entry_class.hpp"
 #include "util/guidance/toolkit.hpp"
+#include "util/typedefs.hpp"
 
 #include <boost/assert.hpp>
 #include <boost/optional.hpp>
@@ -49,15 +50,28 @@ const constexpr char *waypoint_type_names[] = {"invalid", "arrive", "depart"};
 // Check whether to include a modifier in the result of the API
 inline bool isValidModifier(const guidance::StepManeuver maneuver)
 {
-    if (maneuver.waypoint_type != guidance::WaypointType::None &&
-        maneuver.instruction.direction_modifier == DirectionModifier::UTurn)
-        return false;
-    return true;
+    return (maneuver.waypoint_type == guidance::WaypointType::None ||
+            maneuver.instruction.direction_modifier != DirectionModifier::UTurn);
+}
+
+inline bool hasValidLanes(const guidance::StepManeuver maneuver)
+{
+    std::cout << "Turn lanes: " << (int)maneuver.instruction.lane_tupel.lanes_in_turn << " " << (int)maneuver.instruction.lane_tupel.first_lane_from_the_right << std::endl;
+    return maneuver.instruction.lane_tupel.lanes_in_turn > 0;
 }
 
 std::string instructionTypeToString(const TurnType::Enum type)
 {
     return turn_type_names[static_cast<std::size_t>(type)];
+}
+
+util::json::Array laneArrayFromLaneTupe(const util::guidance::LaneTupel lane_tupel)
+{
+    BOOST_ASSERT(lane_tupel.lanes_in_turn >= 1);
+    util::json::Array result;
+    for( LaneID i = 0; i < lane_tupel.lanes_in_turn; ++i )
+        result.values.push_back(lane_tupel.first_lane_from_the_right + i);
+    return result;
 }
 
 std::string instructionModifierToString(const DirectionModifier::Enum modifier)
@@ -141,6 +155,10 @@ util::json::Object makeStepManeuver(const guidance::StepManeuver &maneuver)
         step_maneuver.values["modifier"] =
             detail::instructionModifierToString(maneuver.instruction.direction_modifier);
 
+    if (detail::hasValidLanes(maneuver))
+        step_maneuver.values["lanes"] =
+            detail::laneArrayFromLaneTupe(maneuver.instruction.lane_tupel);
+
     step_maneuver.values["location"] = detail::coordinateToLonLat(maneuver.location);
     step_maneuver.values["bearing_before"] = std::round(maneuver.bearing_before);
     step_maneuver.values["bearing_after"] = std::round(maneuver.bearing_after);
@@ -150,20 +168,19 @@ util::json::Object makeStepManeuver(const guidance::StepManeuver &maneuver)
     return step_maneuver;
 }
 
-util::json::Object
-makeIntersection(const guidance::Intersection &intersection)
+util::json::Object makeIntersection(const guidance::Intersection &intersection)
 {
     util::json::Object result;
     util::json::Array bearings;
     util::json::Array entry;
 
     bearings.values.reserve(intersection.bearings.size());
-    std::copy(intersection.bearings.begin(), intersection.bearings.end(), std::back_inserter(bearings.values));
+    std::copy(intersection.bearings.begin(), intersection.bearings.end(),
+              std::back_inserter(bearings.values));
 
     entry.values.reserve(intersection.entry.size());
     std::transform(intersection.entry.begin(), intersection.entry.end(),
-                   std::back_inserter(entry.values), [](const bool has_entry) -> util::json::Value
-                   {
+                   std::back_inserter(entry.values), [](const bool has_entry) -> util::json::Value {
                        if (has_entry)
                            return util::json::True();
                        else

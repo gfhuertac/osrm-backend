@@ -141,6 +141,10 @@ module.exports = function () {
         return this.extractInstructionList(instructions, s => s.maneuver.bearing_before + '->' + s.maneuver.bearing_after);
     };
 
+    this.lanesList = (instructions) => {
+        return this.extractInstructionList(instructions, s => "lanes" in s.maneuver ? s.maneuver.lanes.join(' ') : '');
+    };
+
     this.annotationList = (instructions) => {
         // Pull out all the distinct segment distances, skipping the arrive
         // instructions, and the leading 0 on all timestamps arrays.
