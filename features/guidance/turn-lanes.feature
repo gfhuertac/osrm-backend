@@ -102,9 +102,9 @@ Feature: Turn Lane Guidance
             | bd    | turn |                    |                   |
 
         When I route I should get
-            | waypoints | route          | turns                       | lanes |
-            | a,d       | road,turn,turn | depart,turn right,arrive    | ,0,   |
-            | a,c       | road,road,road | depart,turn straight,arrive | ,1,   |
+            | waypoints | route          | turns                           | lanes |
+            | a,d       | road,turn,turn | depart,turn right,arrive        | ,0,   |
+            | a,c       | road,road,road | depart,use lane straight,arrive | ,1,   |
 
     #turn lanes are often drawn at the incoming road, even though the actual turn requires crossing the intersection first
     @TODO @WORKAROUND-FIXME

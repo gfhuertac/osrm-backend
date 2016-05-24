@@ -42,8 +42,9 @@ const constexpr char *turn_type_names[] = {
     "invalid",         "new name",   "continue", "turn",        "merge",
     "on ramp",         "off ramp",   "fork",     "end of road", "notification",
     "roundabout",      "roundabout", "rotary",   "rotary",      "roundabout turn",
-    "roundabout turn", "invalid",    "invalid",  "invalid",     "invalid",
-    "invalid",         "invalid",    "invalid",  "invalid",     "invalid"};
+    "roundabout turn", "use lane",   "invalid",  "invalid",     "invalid",
+    "invalid",         "invalid",    "invalid",  "invalid",     "invalid",
+    "invalid"};
 
 const constexpr char *waypoint_type_names[] = {"invalid", "arrive", "depart"};
 
@@ -56,7 +57,8 @@ inline bool isValidModifier(const guidance::StepManeuver maneuver)
 
 inline bool hasValidLanes(const guidance::StepManeuver maneuver)
 {
-    std::cout << "Turn lanes: " << (int)maneuver.instruction.lane_tupel.lanes_in_turn << " " << (int)maneuver.instruction.lane_tupel.first_lane_from_the_right << std::endl;
+    std::cout << "Turn lanes: " << (int)maneuver.instruction.lane_tupel.lanes_in_turn << " "
+              << (int)maneuver.instruction.lane_tupel.first_lane_from_the_right << std::endl;
     return maneuver.instruction.lane_tupel.lanes_in_turn > 0;
 }
 
@@ -69,7 +71,7 @@ util::json::Array laneArrayFromLaneTupe(const util::guidance::LaneTupel lane_tup
 {
     BOOST_ASSERT(lane_tupel.lanes_in_turn >= 1);
     util::json::Array result;
-    for( LaneID i = 0; i < lane_tupel.lanes_in_turn; ++i )
+    for (LaneID i = 0; i < lane_tupel.lanes_in_turn; ++i)
         result.values.push_back(lane_tupel.first_lane_from_the_right + i);
     return result;
 }

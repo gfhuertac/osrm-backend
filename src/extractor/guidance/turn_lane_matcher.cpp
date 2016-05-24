@@ -599,6 +599,8 @@ Intersection TurnLaneMatcher::simpleMatchTuplesToTurns(Intersection intersection
             intersection[road_index].turn.instruction.lane_tupel = {
                 LaneID(lane_data[valid_turn].to - lane_data[valid_turn].from + 1),
                 lane_data[valid_turn].from};
+            if( TurnType::Suppressed == intersection[road_index].turn.instruction.type )
+                intersection[road_index].turn.instruction.type = TurnType::UseLane;
             std::cout << "Assigned: " << lane_data[valid_turn].tag << " to "
                       << toString(intersection[road_index]) << std::endl;
             ++valid_turn;
