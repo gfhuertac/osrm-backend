@@ -169,7 +169,8 @@ Feature: Turn Lane Guidance
             | ce    | turn |                    |
 
         When I route I should get
-            | waypoints | route          | turns                    | lanes |
-            | a,e       | road,turn,turn | depart,turn right,arrive | ,0,   |
+            | waypoints | route          | turns                           | lanes |
+            | a,e       | road,turn,turn | depart,turn right,arrive        | ,0,   |
+            | a,d       | road,road,road | depart,use lane straight,arrive | ,1,   |
 
 
