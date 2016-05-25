@@ -8,9 +8,6 @@ endif()
 
 project(osrm-example C CXX)
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 ")
-
 set(bitness 32)
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
   set(bitness 64)
@@ -23,11 +20,14 @@ if(WIN32 AND MSVC_VERSION LESS 1900)
   message(FATAL_ERROR "Building with Microsoft compiler needs Latest Visual Studio 2015 (Community or better)")
 endif()
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+find_package(LibOSRM REQUIRED)
+
+message(STATUS "hereddd ${LibOSRM_LIBRARY_DIRS}")
+link_directories(${LibOSRM_LIBRARY_DIRS})
+
 add_executable(osrm-example example.cpp)
 
-find_package(LibOSRM REQUIRED)
-find_package(Boost 1.49.0 COMPONENTS filesystem system thread iostreams REQUIRED)
-
-target_link_libraries(osrm-example ${LibOSRM_LIBRARIES} ${Boost_LIBRARIES})
-include_directories(SYSTEM ${LibOSRM_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
-
+set(CMAKE_CXX_FLAGS ${LibOSRM_CXXFLAGS})
+target_link_libraries(osrm-example ${LibOSRM_LIBRARIES})
+include_directories(SYSTEM ${LibOSRM_INCLUDE_DIRS})
