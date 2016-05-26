@@ -587,6 +587,11 @@ class InternalDataFacade final : public BaseDataFacade
         return result;
     }
 
+    std::string GetPronunciationForID(const unsigned name_id) const override final
+    {
+        return GetNameForID(name_id + 1);
+    }
+
     virtual unsigned GetGeometryIndexForEdgeID(const unsigned id) const override final
     {
         return m_via_node_list.at(id);

@@ -46,6 +46,7 @@ struct ExtractionWay
     double backward_speed;
     double duration;
     std::string name;
+    std::string pronunciation;
     bool roundabout;
     bool is_access_restricted;
     bool is_startpoint;
