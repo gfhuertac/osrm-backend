@@ -14,11 +14,9 @@ function(JOIN VALUES GLUE OUTPUT)
 endfunction()
 
 JOIN("${PC_LibOSRM_CFLAGS}" " " output)
-#MESSAGE("${output}") # will output "a:b:c"
 
 set(LibOSRM_CXXFLAGS ${output})
 set(LibOSRM_LIBRARY_DIRS ${PC_LibOSRM_LIBRARY_DIRS})
-message(STATUS "static ${PC_LibOSRM_STATIC_LDFLAGS}")
 
 find_path(LibOSRM_INCLUDE_DIR osrm/osrm.hpp
   PATH_SUFFIXES osrm include/osrm include

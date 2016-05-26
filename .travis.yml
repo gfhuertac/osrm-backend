@@ -148,7 +148,7 @@ install:
   - popd
   - mkdir example/build && pushd example/build
   - cmake ..
-  - make
+  - make VERBOSE=1
   - popd
 
 script:

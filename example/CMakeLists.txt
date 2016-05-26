@@ -23,7 +23,6 @@ endif()
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 find_package(LibOSRM REQUIRED)
 
-message(STATUS "hereddd ${LibOSRM_LIBRARY_DIRS}")
 link_directories(${LibOSRM_LIBRARY_DIRS})
 
 add_executable(osrm-example example.cpp)
