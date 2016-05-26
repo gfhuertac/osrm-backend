@@ -154,7 +154,6 @@ Feature: Turn Lane Guidance
 
 
     #this can happen due to traffic lights / lanes not drawn up to the intersection itself
-    @TODO
     Scenario: Turn Lanes Given earlier than actual turn
         Given the node map
             | a |   | b | c |   | d |
@@ -173,4 +172,25 @@ Feature: Turn Lane Guidance
             | a,e       | road,turn,turn | depart,turn right,arrive        | ,0,   |
             | a,d       | road,road,road | depart,use lane straight,arrive | ,1,   |
 
+    Scenario: Turn Lanes Given earlier than actual turn
+        Given the node map
+            | a |   | b | c | d |   | e |   | f | g | h |   | i |
+            |   |   | j |   |   |   |   |   |   |   | k |   |   |
+
+        And the ways
+            | nodes | name        | turn:lanes:forward | turn:lanes:backward |
+            | abc   | road        |                    |                     |
+            | cd    | road        |                    | left\|              |
+            | def   | road        |                    |                     |
+            | fg    | road        | \|right            |                     |
+            | ghi   | road        |                    |                     |
+            | bj    | first-turn  |                    |                     |
+            | hk    | second-turn |                    |                     |
+
+        When I route I should get
+            | waypoints | route                        | turns                           | lanes |
+            | a,k       | road,second-turn,second-turn | depart,turn right,arrive        | ,0,   |
+            | a,i       | road,road,road               | depart,use lane straight,arrive | ,1,   |
+            | i,j       | road,first-turn,first-turn   | depart,turn left,arrive         | ,1,   |
+            | i,a       | road,road,road               | depart,use lane straight,arrive | ,0,   |
 

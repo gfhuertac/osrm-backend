@@ -20,7 +20,7 @@ struct NodeBasedEdgeData
     NodeBasedEdgeData()
         : distance(INVALID_EDGE_WEIGHT), edge_id(SPECIAL_NODEID),
           name_id(std::numeric_limits<unsigned>::max()), access_restricted(false), reversed(false),
-          roundabout(false), travel_mode(TRAVEL_MODE_INACCESSIBLE)
+          roundabout(false), travel_mode(TRAVEL_MODE_INACCESSIBLE), lane_id(INVALID_LANEID)
     {
     }
 
@@ -55,7 +55,7 @@ struct NodeBasedEdgeData
         return (name_id == other.name_id) && (reversed == other.reversed) &&
                (roundabout == other.roundabout) && (startpoint == other.startpoint) &&
                (access_restricted == other.access_restricted) &&
-               (travel_mode == other.travel_mode) && (lane_id == other.lane_id) &&
+               (travel_mode == other.travel_mode) &&
                (road_classification == other.road_classification);
     }
 };

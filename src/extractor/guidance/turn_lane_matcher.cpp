@@ -67,7 +67,8 @@ Intersection TurnLaneMatcher::assignTurnLanes(const EdgeID via_edge,
                                               Intersection intersection) const
 {
     const auto &data = node_based_graph.GetEdgeData(via_edge);
-    const auto turn_lane_string = turn_lane_strings.GetNameForID(data.lane_id);
+    const auto turn_lane_string =
+        data.lane_id != INVALID_LANEID ? turn_lane_strings.GetNameForID(data.lane_id) : "";
     std::cout << "Edge: " << via_edge << " String " << turn_lane_string << std::endl;
 
     if (turn_lane_string.empty())
@@ -516,11 +517,14 @@ bool TurnLaneMatcher::isSimpleIntersection(const LaneDataVector &lane_data,
     // intersection, or in case of a merge. If not all but one (straight) are merges, we don't
     // consider the intersection simple
     if (intersection.size() == 2)
+    {
+        std::cout << "Checking for merge" << std::endl;
         return std::count_if(
                    lane_data.begin(), lane_data.end(),
                    [](const TurnLaneData &data) { return boost::starts_with(data.tag, "merge"); }) +
                    std::size_t{1} >=
                lane_data.size();
+    }
 
     // in case an intersection offers far more lane data items than actual turns, some of them
     // have
@@ -531,16 +535,23 @@ bool TurnLaneMatcher::isSimpleIntersection(const LaneDataVector &lane_data,
 
     // more than two additional lane data entries -> lanes target a different intersection
     if (num_turns + std::size_t{2} <= lane_data.size())
+    {
+        std::cout << "Too mane lane data entries for the current intersection." << std::endl;
         return false;
+    }
 
     // single additional lane data entry is alright, if it is none at the side. This usually
     // refers to a bus-lane
     if (num_turns + std::size_t{1} == lane_data.size())
+    {
+        std::cout << "Additional Lane Check" << std::endl;
         return lane_data.front().tag == "none" || lane_data.back().tag == "none";
+    }
 
     // more turns than lane data
     if (num_turns > lane_data.size())
     {
+        std::cout << "Potentially missing lane entry" << std::endl;
         return lane_data.end() !=
                std::find_if(lane_data.begin(), lane_data.end(),
                             [](const TurnLaneData &data) { return data.tag == "none"; });
@@ -562,7 +573,10 @@ bool TurnLaneMatcher::isSimpleIntersection(const LaneDataVector &lane_data,
     // TODO this has to be handled for the ingoing edge as well. Might be we have to get the
     // turn lane string from our predecessor
     if (angularDeviation(straightmost_turn.turn.angle, 180) > NARROW_TURN_ANGLE)
+    {
+        std::cout << "No Straight Turn" << std::endl;
         return false;
+    }
 
     const auto &data = node_based_graph.GetEdgeData(straightmost_turn.turn.eid);
     if (data.distance > 30)
@@ -599,7 +613,7 @@ Intersection TurnLaneMatcher::simpleMatchTuplesToTurns(Intersection intersection
             intersection[road_index].turn.instruction.lane_tupel = {
                 LaneID(lane_data[valid_turn].to - lane_data[valid_turn].from + 1),
                 lane_data[valid_turn].from};
-            if( TurnType::Suppressed == intersection[road_index].turn.instruction.type )
+            if (TurnType::Suppressed == intersection[road_index].turn.instruction.type)
                 intersection[road_index].turn.instruction.type = TurnType::UseLane;
             std::cout << "Assigned: " << lane_data[valid_turn].tag << " to "
                       << toString(intersection[road_index]) << std::endl;
