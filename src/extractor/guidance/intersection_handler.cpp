@@ -43,7 +43,7 @@ std::size_t IntersectionHandler::countValid(const Intersection &intersection) co
 }
 
 TurnType::Enum IntersectionHandler::findBasicTurnType(const EdgeID via_edge,
-                                                const ConnectedRoad &road) const
+                                                      const ConnectedRoad &road) const
 {
 
     const auto &in_data = node_based_graph.GetEdgeData(via_edge);
@@ -56,7 +56,7 @@ TurnType::Enum IntersectionHandler::findBasicTurnType(const EdgeID via_edge,
     if (!on_ramp && onto_ramp)
         return TurnType::OnRamp;
 
-    if (in_data.name_id == out_data.name_id && in_data.name_id != INVALID_NAME_ID)
+    if (in_data.name_id == out_data.name_id && in_data.name_id != INVALID_NAMEID)
     {
         return TurnType::Continue;
     }
@@ -305,7 +305,7 @@ void IntersectionHandler::assignTrivialTurns(const EdgeID via_eid,
 bool IntersectionHandler::isThroughStreet(const std::size_t index,
                                           const Intersection &intersection) const
 {
-    if (node_based_graph.GetEdgeData(intersection[index].turn.eid).name_id == INVALID_NAME_ID)
+    if (node_based_graph.GetEdgeData(intersection[index].turn.eid).name_id == INVALID_NAMEID)
         return false;
     for (const auto &road : intersection)
     {

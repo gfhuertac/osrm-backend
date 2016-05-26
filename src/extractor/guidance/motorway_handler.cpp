@@ -127,7 +127,7 @@ Intersection MotorwayHandler::fromMotorway(const EdgeID via_eid, Intersection in
         {
             const auto &out_data = node_based_graph.GetEdgeData(road.turn.eid);
             if (road.turn.angle != 0 && in_data.name_id == out_data.name_id &&
-                in_data.name_id != INVALID_NAME_ID &&
+                in_data.name_id != INVALID_NAMEID &&
                 detail::isMotorwayClass(out_data.road_classification.road_class))
                 return road.turn.angle;
         }
@@ -251,18 +251,16 @@ Intersection MotorwayHandler::fromMotorway(const EdgeID via_eid, Intersection in
                     else if (road.turn.angle < continue_angle)
                     {
                         road.turn.instruction = {
-                            detail::isRampClass(road.turn.eid, node_based_graph)
-                                ? TurnType::OffRamp
-                                : TurnType::Turn,
+                            detail::isRampClass(road.turn.eid, node_based_graph) ? TurnType::OffRamp
+                                                                                 : TurnType::Turn,
                             (road.turn.angle < 145) ? DirectionModifier::Right
                                                     : DirectionModifier::SlightRight};
                     }
                     else if (road.turn.angle > continue_angle)
                     {
                         road.turn.instruction = {
-                            detail::isRampClass(road.turn.eid, node_based_graph)
-                                ? TurnType::OffRamp
-                                : TurnType::Turn,
+                            detail::isRampClass(road.turn.eid, node_based_graph) ? TurnType::OffRamp
+                                                                                 : TurnType::Turn,
                             (road.turn.angle > 215) ? DirectionModifier::Left
                                                     : DirectionModifier::SlightLeft};
                     }
@@ -373,7 +371,7 @@ Intersection MotorwayHandler::fromRamp(const EdgeID via_eid, Intersection inters
             {
                 if (detail::isMotorwayClass(intersection[1].turn.eid, node_based_graph) &&
                     node_based_graph.GetEdgeData(intersection[2].turn.eid).name_id !=
-                        INVALID_NAME_ID &&
+                        INVALID_NAMEID &&
                     node_based_graph.GetEdgeData(intersection[2].turn.eid).name_id ==
                         node_based_graph.GetEdgeData(intersection[1].turn.eid).name_id)
                 {
@@ -398,7 +396,7 @@ Intersection MotorwayHandler::fromRamp(const EdgeID via_eid, Intersection inters
                 BOOST_ASSERT(intersection[2].entry_allowed);
                 if (detail::isMotorwayClass(intersection[2].turn.eid, node_based_graph) &&
                     node_based_graph.GetEdgeData(intersection[1].turn.eid).name_id !=
-                        INVALID_NAME_ID &&
+                        INVALID_NAMEID &&
                     node_based_graph.GetEdgeData(intersection[1].turn.eid).name_id ==
                         node_based_graph.GetEdgeData(intersection[0].turn.eid).name_id)
                 {
